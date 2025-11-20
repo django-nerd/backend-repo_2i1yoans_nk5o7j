@@ -1,48 +1,35 @@
-"""
-Database Schemas
+from pydantic import BaseModel, Field, HttpUrl
+from typing import Optional, List
 
-Define your MongoDB collection schemas here using Pydantic models.
-These schemas are used for data validation in your application.
+# Vibe Station schemas
 
-Each Pydantic model represents a collection in your database.
-Model name is converted to lowercase for the collection name:
-- User -> "user" collection
-- Product -> "product" collection
-- BlogPost -> "blogs" collection
-"""
+class Pricing(BaseModel):
+    type: str = Field(..., description="one-time | subscription | negotiation")
+    amount: Optional[float] = Field(None, ge=0)
+    currency: str = Field("USD")
 
-from pydantic import BaseModel, Field
-from typing import Optional
+class Links(BaseModel):
+    external_url: Optional[HttpUrl] = None
+    github_url: Optional[HttpUrl] = None
+    embed_url: Optional[HttpUrl] = None
+    zip_url: Optional[HttpUrl] = None
 
-# Example schemas (replace with your own):
+class AIInsights(BaseModel):
+    summary: Optional[str] = None
+    pitch: Optional[str] = None
+    landing_copy: Optional[str] = None
+    deck_outline: Optional[List[str]] = None
+    tags: List[str] = []
+    readiness_score: Optional[float] = Field(None, ge=0, le=100)
+    market_fit_score: Optional[float] = Field(None, ge=0, le=100)
+    suggestions: Optional[List[str]] = None
 
-class User(BaseModel):
-    """
-    Users collection schema
-    Collection name: "user" (lowercase of class name)
-    """
-    name: str = Field(..., description="Full name")
-    email: str = Field(..., description="Email address")
-    address: str = Field(..., description="Address")
-    age: Optional[int] = Field(None, ge=0, le=120, description="Age in years")
-    is_active: bool = Field(True, description="Whether user is active")
-
-class Product(BaseModel):
-    """
-    Products collection schema
-    Collection name: "product" (lowercase of class name)
-    """
-    title: str = Field(..., description="Product title")
-    description: Optional[str] = Field(None, description="Product description")
-    price: float = Field(..., ge=0, description="Price in dollars")
-    category: str = Field(..., description="Product category")
-    in_stock: bool = Field(True, description="Whether product is in stock")
-
-# Add your own schemas here:
-# --------------------------------------------------
-
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+class Project(BaseModel):
+    name: str
+    description: Optional[str] = None
+    tech_stack: List[str] = []
+    category: Optional[str] = None
+    pricing: Optional[Pricing] = None
+    status: str = Field("MVP", description="MVP | prototype | commercial-ready")
+    links: Optional[Links] = None
+    thumbnails: List[str] = []
